@@ -1,0 +1,29 @@
+{
+  "name": "menguer-wallet",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build-ts": "tsc",
+    "postinstall": "npm run build-ts",
+    "start-production": "node dist/server.js",
+    "dev": "nodemon",
+    "start": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts"
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0",
+    "mongodb": "^3.6.2",
+    "node-cron": "^2.0.3",
+    "typescript": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/async": "^3.2.5",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/mongodb": "^3.5.27",
+    "@types/node-cron": "^2.0.3",
+    "nodemon": "^2.0.5",
+    "ts-node-dev": "^1.0.0-pre.65"
+  }
+}
