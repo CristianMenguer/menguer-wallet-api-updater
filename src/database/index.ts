@@ -153,3 +153,26 @@ export const count = ((collectionName: string, filter = {}) => {
         })
     })
 })
+
+export const addMany = (collectionName: string, items: object[]) => {
+    return new Promise((resolve, reject) => {
+        MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+            if (err) {
+                console.log(' --- add ERROR --- ')
+                console.log(err)
+                reject(err)
+            }
+            const db = client.db(DB_NAME)
+            const collection = db.collection(collectionName)
+            collection.insertMany(items, (err, result) => {
+                if (err) {
+                    console.log(' --- add ERROR --- ')
+                    console.log(err)
+                    reject(err)
+                }
+                resolve(result)
+                client.close()
+            })
+        })
+    })
+}

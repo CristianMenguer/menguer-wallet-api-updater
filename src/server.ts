@@ -5,12 +5,8 @@ const firstRun = () => {
     firstInsertion()
 }
 
-firstRun()
+//firstRun()
 
-// cron.schedule('20,22 * * *', () => {
-//     console.log('Running in specific hours at America/Sao_Paulo timezone')
-//     updateQuotesService()
-// }, {
-//     scheduled: true,
-//     timezone: "America/Sao_Paulo"
-// })
+// cron.schedule('*/2 * * *', () => updateQuotesService())
+
+updateQuotesService()

@@ -4,6 +4,17 @@ import { pregaoToDate } from '../Utils/ValidateInputs'
 
 const COLLECTION = 'quote'
 
+export const insertQuotes = async (quotes: Quote[]): Promise<void> => {
+    try {
+        console.log(quotes)
+        const results = await db.addMany(COLLECTION, quotes)
+    } catch (err) {
+        console.log('Error: > Quote.model > insertQuotes:')
+        console.log(err)
+        //return {} as Quote
+    }
+}
+
 export const upsertQuote = async (quote: Quote): Promise<void> => {
     try {
         const filter = { $and: [{ code_stock: quote.code_stock }, { date: quote.date }] }

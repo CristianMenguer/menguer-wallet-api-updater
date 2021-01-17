@@ -3,13 +3,59 @@ import Quote from '../entities/Quote'
 import { mapSeries } from 'async'
 
 import { getCompanies, upsertCompany } from '../models/Company'
-import { upsertQuote, getLastUpdateByCodeStock, getAmountQuotesByCodeStock } from '../models/Quote'
+import { upsertQuote, getLastUpdateByCodeStock, getAmountQuotesByCodeStock, insertQuotes } from '../models/Quote'
 import { padL, replaceAll, sleep, sleep2 } from '../Utils/Utils'
 import apiCompanies from './GetCompaniesApiService'
 import apiHistorical from './GetHistoricalApiService'
 import sysInfoApiDaily from './GetLastUpdateApiService'
 
+// const DELAY_CONN = 10000
+const DELAY_CONN = 1000
+
 export const firstInsertion = async (): Promise<void> => {
+
+    const COMPANIES_RDZ = [
+        'OIBR',
+        'PETR',
+        'UGPA',
+        'TIET',
+        'VALE',
+        'BIDI',
+        'GOAU',
+        'BBAS',
+        'USIM',
+        'BRKM',
+        'UNIP',
+        'ITUB',
+        'KLBN',
+        'SUZB',
+        'MILS',
+        'EMBR',
+        'POMO',
+        'B3SA',
+        'WEGE',
+        'ROMI',
+        'AZUL',
+        'GOLL',
+        'IRBR',
+        'ECOR',
+        'ATOM',
+        'JBSS',
+        'MRFG',
+        'BEEF',
+        'CAML',
+        'ABEV',
+        'PCAR',
+        'EVEN',
+        'JHSF',
+        'GRND',
+        'SEER',
+        'RENT',
+        'SMLS',
+        'MGLU',
+        'FLRY',
+        'ITSA'
+    ]
 
     const sysInfo = await sysInfoApiDaily()
     if (!!!sysInfo) {
@@ -26,56 +72,43 @@ export const firstInsertion = async (): Promise<void> => {
     //
     await mapSeries(companies, async (companyAPI, callbackCompany): Promise<void> => {
         countCompanies++
-        console.log(`\n\nlog => companies => ${padL((companyAPI.nm_empresa), ' ', 20)}: ${padL(countCompanies + '/' + lenCompanies, ' ', 10)} - ${Math.trunc((countCompanies * 100) / lenCompanies)}%`)
         const codes: string[] = replaceAll(companyAPI.cd_acao, ' ', '').split(',')
         //
-        //if (countCompanies >= 40) 
-        {
+        if (COMPANIES_RDZ.includes(companyAPI.cd_acao_rdz)) {
+            console.log(`\nlog => company => ${padL((companyAPI.nm_empresa), ' ', 20)}: ${padL(countCompanies + '/' + lenCompanies, ' ', 10)} - ${Math.trunc((countCompanies * 100) / lenCompanies)}%`)
             await mapSeries(codes, async (code, callbackCode): Promise<void> => {
                 if (code.length >= 4) {
-                    while (((new Date()).getTime() - previousDate.getTime()) < 15000)
-                        await sleep(1000)
+                    while (((new Date()).getTime() - previousDate.getTime()) < DELAY_CONN)
+                        await sleep(Math.floor(DELAY_CONN / 5))
                     //
                     const quotes = await apiHistorical(code, true)
                     previousDate = new Date()
+                    //
                     const lenQuotes = Object.keys(quotes).length
-                    const lenQuotesDB = await getAmountQuotesByCodeStock(code)
                     //
-                    console.log(`lenQuotes: ${lenQuotes} <==> lenQuotesDB: ${lenQuotesDB}`)
-                    //
-                    if (!!quotes && lenQuotes > 0 && lenQuotes > lenQuotesDB) {
-                        let countQuotes = 0
+                    if (!!quotes && lenQuotes > 0) {
                         const company: Company = new Company(companyAPI.id, companyAPI.cd_acao_rdz, companyAPI.nm_empresa, companyAPI.cd_acao, companyAPI.setor_economico, companyAPI.subsetor, companyAPI.subsetor)
                         await upsertCompany(company)
                         //
-                        const lastUpdate = await getLastUpdateByCodeStock(code)
+                        while (((new Date()).getTime() - previousDate.getTime()) < DELAY_CONN)
+                            await sleep(Math.floor(DELAY_CONN / 5))
                         //
+                        previousDate = new Date()
+                        //
+                        const quotesToAdd = [] as Quote[]
                         await mapSeries(Object.keys(quotes), async (keyDate, callbackDate): Promise<void> => {
-                            countQuotes++
-                            if (previousPerc !== Math.trunc((countQuotes * 100) / lenQuotes)) {
-                                previousPerc = Math.trunc((countQuotes * 100) / lenQuotes)
-                                //
-                                console.log(`log => companies ${(code)}: ${countCompanies}/${lenCompanies} (${Math.trunc((countCompanies * 100) / lenCompanies)}%) ... => quotes (${keyDate}): ${countQuotes}/${lenQuotes} (${previousPerc}%)`)
-                            }
                             const dateAPI = new Date(keyDate)
-                            const needsUpdate = !lastUpdate || (dateAPI !== lastUpdate)
-                            //
-                            if (needsUpdate) {
-                                //console.log('\n-' + code + `- needs update (${keyDate})`)
-
-                                // @ts-ignore
-                                const quoteAPI = quotes[keyDate] as HistoricalResponse
-                                // console.log('quoteAPI')
-                                // console.log(quoteAPI)
-                                const quoteToInsert = new Quote(company.id_api, code, parseFloat(quoteAPI['1. open']), parseFloat(quoteAPI['4. close']), parseFloat(quoteAPI['2. high']), parseFloat(quoteAPI['3. low']), parseFloat(quoteAPI['6. volume']), dateAPI, parseFloat(quoteAPI['7. dividend amount']), parseFloat(quoteAPI['8. split coefficient']))
-                                // console.log('quoteToInsert')
-                                // console.log(quoteToInsert)
-                                await upsertQuote(quoteToInsert)
-                            } else {
-                                //console.log('\n-' + code + '- is up to date')
-                            }
+                            // @ts-ignore
+                            const quoteAPI = quotes[keyDate] as HistoricalResponse
+                            const quoteToInsert = new Quote(company.id_api, code, parseFloat(quoteAPI['1. open']), parseFloat(quoteAPI['4. close']), parseFloat(quoteAPI['2. high']), parseFloat(quoteAPI['3. low']), parseFloat(quoteAPI['6. volume']), dateAPI, parseFloat(quoteAPI['7. dividend amount']), parseFloat(quoteAPI['8. split coefficient']))
+                            quotesToAdd.push(quoteToInsert)
                             callbackDate()
                         })
+                        await insertQuotes(quotesToAdd)
+                        while (((new Date()).getTime() - previousDate.getTime()) < DELAY_CONN)
+                            await sleep(Math.floor(DELAY_CONN / 5))
+                        //
+                        previousDate = new Date()
                     }
                 }
                 callbackCode()
@@ -94,15 +127,17 @@ export const updateQuotesService = async (): Promise<void> => {
     const lenCompanies = companies.length
     let countCompanies = 0
     //
+    const quotesToAdd = [] as Quote[]
+    //
     await mapSeries(companies, async (companyDB, callbackCompany): Promise<void> => {
         countCompanies++
-        console.log(`\n\nlog => companies => ${padL((companyDB.name), ' ', 20)}: ${padL(countCompanies + '/' + lenCompanies, ' ', 10)} - ${Math.trunc((countCompanies * 100) / lenCompanies)}%`)
+        console.log(`\n\nlog => company => ${padL((companyDB.name), ' ', 20)}: ${padL(countCompanies + '/' + lenCompanies, ' ', 10)} - ${Math.trunc((countCompanies * 100) / lenCompanies)}%`)
         const codes: string[] = replaceAll(companyDB.code, ' ', '').split(',')
         //
         await mapSeries(codes, async (code, callbackCode): Promise<void> => {
             if (code.length >= 4) {
-                while (((new Date()).getTime() - previousDate.getTime()) < 15000)
-                    await sleep(1000)
+                while (((new Date()).getTime() - previousDate.getTime()) < DELAY_CONN)
+                    await sleep(Math.floor(DELAY_CONN / 5))
                 //
                 const quotes = await apiHistorical(code, false)
                 previousDate = new Date()
@@ -116,14 +151,14 @@ export const updateQuotesService = async (): Promise<void> => {
                         const dateAPI = new Date(keyDate)
                         const needsUpdate = !lastUpdate || (dateAPI > lastUpdate)
                         //
-                        //console.log(`DateAPI: ${dateAPI} <==> DateLastUpdate: ${lastUpdate} <==> needsUpdate: ${needsUpdate}`)
                         if (needsUpdate) {
                             // @ts-ignore
                             const quoteAPI = quotes[keyDate] as HistoricalResponse
                             const quoteToInsert = new Quote(companyDB.id_api, code, parseFloat(quoteAPI['1. open']), parseFloat(quoteAPI['4. close']), parseFloat(quoteAPI['2. high']), parseFloat(quoteAPI['3. low']), parseFloat(quoteAPI['6. volume']), dateAPI, parseFloat(quoteAPI['7. dividend amount']), parseFloat(quoteAPI['8. split coefficient']))
-                            await upsertQuote(quoteToInsert)
-                        } else {
-                            //console.log('\n-' + code + '- is up to date')
+                            //await upsertQuote(quoteToInsert)
+                            console.log('quoteToInsert')
+                            console.log(quoteToInsert)
+                            quotesToAdd.push(quoteToInsert)
                         }
                         callbackDate()
                     })
@@ -133,5 +168,12 @@ export const updateQuotesService = async (): Promise<void> => {
         })
         callbackCompany()
     })
+    //
+    console.log('\nquotesToAdd.length:')
+    console.log(quotesToAdd.length)
+    if (quotesToAdd.length > 0) {
+        await insertQuotes(quotesToAdd)
+        
+    }
 }
 
