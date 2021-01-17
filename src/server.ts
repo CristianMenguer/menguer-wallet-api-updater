@@ -1,12 +1,5 @@
 import cron from 'node-cron'
-import { firstInsertion, updateQuotesService } from './services/UpdateDatabaseAPIService'
+import { updateQuotesService } from './services/UpdateDatabaseAPIService'
 
-const firstRun = () => {
-    firstInsertion()
-}
+cron.schedule('*/3 * * *', () => updateQuotesService())
 
-//firstRun()
-
-// cron.schedule('*/2 * * *', () => updateQuotesService())
-
-updateQuotesService()

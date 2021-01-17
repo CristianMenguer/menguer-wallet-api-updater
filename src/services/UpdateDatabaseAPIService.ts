@@ -9,8 +9,7 @@ import apiCompanies from './GetCompaniesApiService'
 import apiHistorical from './GetHistoricalApiService'
 import sysInfoApiDaily from './GetLastUpdateApiService'
 
-// const DELAY_CONN = 10000
-const DELAY_CONN = 1000
+const DELAY_CONN = (process.env.DELAY_CONN && parseInt(process.env.DELAY_CONN) > 0) ? parseInt(process.env.DELAY_CONN) : 10000
 
 export const firstInsertion = async (): Promise<void> => {
 
