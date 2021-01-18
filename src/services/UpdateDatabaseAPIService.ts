@@ -156,8 +156,8 @@ export const updateQuotesService = async (): Promise<void> => {
                             const quoteAPI = quotes[keyDate] as HistoricalResponse
                             const quoteToInsert = new Quote(companyDB.id_api, code, parseFloat(quoteAPI['1. open']), parseFloat(quoteAPI['4. close']), parseFloat(quoteAPI['2. high']), parseFloat(quoteAPI['3. low']), parseFloat(quoteAPI['6. volume']), dateAPI, parseFloat(quoteAPI['7. dividend amount']), parseFloat(quoteAPI['8. split coefficient']))
                             //await upsertQuote(quoteToInsert)
-                            console.log('quoteToInsert')
-                            console.log(quoteToInsert)
+                            // console.log('quoteToInsert')
+                            // console.log(quoteToInsert)
                             quotesToAdd.push(quoteToInsert)
                         }
                         callbackDate()
@@ -169,8 +169,7 @@ export const updateQuotesService = async (): Promise<void> => {
         callbackCompany()
     })
     //
-    console.log('\nquotesToAdd.length:')
-    console.log(quotesToAdd.length)
+    console.log('\nQuotes to be added:' + quotesToAdd.length)
     if (quotesToAdd.length > 0) {
         await insertQuotes(quotesToAdd)
         
