@@ -6,16 +6,20 @@ const HOSTNAME = '0.0.0.0'
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000
 
-cron.schedule('* */3 * * 1-5', () => {
+cron.schedule('0 */3 * * 1-5', () => {
     console.log('cron')
-    //updateQuotesService()
+    updateQuotesService()
+}, {
+    scheduled: true,
+    timezone: "America/Sao_Paulo"
 })
 
 const app = express()
 
 app.get('/checkforupdates', (request: Request, response: Response) => {
+    console.log('checkforupdates')
     updateQuotesService()
-    
+
     return response.status(404).json({
         title: 'Welcome to Menguer Wallet - 2020087 API 👍🏼',
         message: 'This command has forced an update!'
