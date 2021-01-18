@@ -118,7 +118,7 @@ export const firstInsertion = async (): Promise<void> => {
 }
 
 export const updateQuotesService = async (): Promise<void> => {
-    console.log(`\n\nlog => running update (${new Date()})\n\n`)
+    console.log(`\nlog => running update (${new Date()})\n\n`)
 
     let previousDate = new Date()
 

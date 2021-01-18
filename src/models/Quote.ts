@@ -8,6 +8,7 @@ export const insertQuotes = async (quotes: Quote[]): Promise<void> => {
     try {
         //console.log(quotes)
         const results = await db.addMany(COLLECTION, quotes)
+        //        
     } catch (err) {
         console.log('Error: > Quote.model > insertQuotes:')
         console.log(err)
