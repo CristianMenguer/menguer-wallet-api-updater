@@ -6,7 +6,10 @@ const HOSTNAME = '0.0.0.0'
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000
 
-cron.schedule('* */3 * * 1-5', () => updateQuotesService())
+cron.schedule('* */3 * * 1-5', () => {
+    console.log('cron')
+    //updateQuotesService()
+})
 
 const app = express()
 
