@@ -68,3 +68,13 @@ export const pregaoToDate = (input: number): Date | null => {
     return new Date(year, month, day)
 }
 
+export const datesEqual = (date1: Date, date2: Date): boolean => {
+    if (date1 === null || date2 === null)
+        return false
+    //
+    let result = true
+    result = result && (date1.getFullYear() === date2.getFullYear())
+    result = result && (date1.getMonth() === date2.getMonth())
+    result = result && (date1.getDate() === date2.getDate())
+    return result
+}

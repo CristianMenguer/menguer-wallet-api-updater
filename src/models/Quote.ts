@@ -116,6 +116,8 @@ export const getQuoteByCodeStockAndDate = async (params: ParamDates): Promise<Qu
                         }
                     ]
             }
+        } else {
+            filter = { code_stock: codeStock }
         }
     //
 

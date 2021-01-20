@@ -8,7 +8,7 @@ import { padL, replaceAll, sleep, sleep2 } from '../Utils/Utils'
 import apiCompanies from './GetCompaniesApiService'
 import apiHistorical from './GetHistoricalApiService'
 import sysInfoApiDaily from './GetLastUpdateApiService'
-import { dateToPregao, dateToPregaoHiphen } from '../Utils/ValidateInputs'
+import { datesEqual, dateToPregao, dateToPregaoHiphen } from '../Utils/ValidateInputs'
 
 const DELAY_CONN = (process.env.DELAY_CONN && parseInt(process.env.DELAY_CONN) > 0) ? parseInt(process.env.DELAY_CONN) : 10000
 
@@ -189,7 +189,9 @@ export const updateQuotesServiceWhile = async (): Promise<void> => {
     while (companies.length > 0) {
         const companyDB = companies.shift()
         countCompanies++
-        if (!!companyDB) {
+        if (!!companyDB
+            //&& countCompanies === 1
+        ) {
             console.log(`\nlog => company => ${padL((companyDB.name), ' ', 20)}: ${padL(countCompanies + '/' + lenCompanies, ' ', 10)} - ${Math.trunc((countCompanies * 100) / lenCompanies)}%`)
             const codes: string[] = replaceAll(companyDB.code, ' ', '').split(',')
             //
@@ -206,18 +208,19 @@ export const updateQuotesServiceWhile = async (): Promise<void> => {
                     //
                     if (!!quotes && lenQuotes > 0) {
                         const keys = Object.keys(quotes)
+                        //
+                        const quotesSQLite = await getQuoteByCodeStockAndDate({
+                            codeStock: code
+                        })
+                        //
                         while (keys.length > 0) {
                             const keyDate = keys.shift()
                             //
                             if (!!keyDate) {
                                 const dateAPI = new Date(keyDate)
-                                // console.log(`keyDate: ${keyDate}`)
-                                const quotesByDate = await getQuoteByCodeStockAndDate({
-                                    codeStock: code,
-                                    date: dateToPregaoHiphen(dateAPI, true)
-                                })
-                                // console.log(`quotesByDate: ${quotesByDate}`)
-                                const needsUpdate = !(!!quotesByDate && !!quotesByDate.length && quotesByDate.length > 0)
+                                //
+                                const quoteByDate = quotesSQLite.filter(quoteFilter => datesEqual(quoteFilter.date, dateAPI))
+                                const needsUpdate = !quoteByDate || !quoteByDate.length || quoteByDate.length < 1
                                 //
                                 if (needsUpdate) {
                                     // @ts-ignore
@@ -236,8 +239,8 @@ export const updateQuotesServiceWhile = async (): Promise<void> => {
     }
     //
     console.log('\nQuotes to be added:' + quotesToAdd.length)
-    // console.log(quotesToAdd)
     if (quotesToAdd.length > 0)
         await insertQuotes(quotesToAdd)
+    //console.log(quotesToAdd[0])
     //
 }
