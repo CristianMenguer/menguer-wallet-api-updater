@@ -51,6 +51,13 @@ export const dateToPregao = (input: Date): number => {
     return parseInt(input.getFullYear().toString() + ('0' + (input.getMonth() + 1)).toString().slice(-2) + ('0' + input.getDate().toString()).slice(-2))
 }
 
+export const dateToPregaoHiphen = (input: Date, hyphen: boolean = false): string => {
+    if (input === null)
+        return ''
+    //
+    return (input.getFullYear().toString() + (hyphen ? '-' : '') + ('0' + (input.getMonth() + 1)).toString().slice(-2) + (hyphen ? '-' : '') + ('0' + input.getDate().toString()).slice(-2))
+}
+
 export const pregaoToDate = (input: number): Date | null => {
     if (input === null || input < 20000000)
         return null
@@ -60,3 +67,4 @@ export const pregaoToDate = (input: number): Date | null => {
     const day = parseInt(input.toString().substr(6, 2))
     return new Date(year, month, day)
 }
+

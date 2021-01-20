@@ -97,7 +97,6 @@ export const getQuoteByCodeStockAndDate = async (params: ParamDates): Promise<Qu
 
     if (!!date && date !== '') {
         const dateFormatted = date.replace(/\D+/g, '')
-        console.log(pregaoToDate(parseInt(dateFormatted)))
         filter = { $and: [{ code_stock: codeStock }, { date: pregaoToDate(parseInt(dateFormatted)) }] }
     }
     else

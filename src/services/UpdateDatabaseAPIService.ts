@@ -3,11 +3,12 @@ import Quote from '../entities/Quote'
 import { mapSeries } from 'async'
 
 import { getCompanies, upsertCompany } from '../models/Company'
-import { upsertQuote, getLastUpdateByCodeStock, getAmountQuotesByCodeStock, insertQuotes } from '../models/Quote'
+import { upsertQuote, getLastUpdateByCodeStock, getAmountQuotesByCodeStock, insertQuotes, getQuoteByCodeStockAndDate } from '../models/Quote'
 import { padL, replaceAll, sleep, sleep2 } from '../Utils/Utils'
 import apiCompanies from './GetCompaniesApiService'
 import apiHistorical from './GetHistoricalApiService'
 import sysInfoApiDaily from './GetLastUpdateApiService'
+import { dateToPregao, dateToPregaoHiphen } from '../Utils/ValidateInputs'
 
 const DELAY_CONN = (process.env.DELAY_CONN && parseInt(process.env.DELAY_CONN) > 0) ? parseInt(process.env.DELAY_CONN) : 10000
 
@@ -179,18 +180,17 @@ export const updateQuotesServiceWhile = async (): Promise<void> => {
     let previousDate = new Date()
 
     const companies = await getCompanies()
-
-    console.log(`Companies length: ${companies.length}`)
     const lenCompanies = companies.length
+    const quotesToAdd = [] as Quote[]
     let countCompanies = 0
     //
-    const quotesToAdd = [] as Quote[]
+    console.log(`Companies length: ${lenCompanies}`)
     //
     while (companies.length > 0) {
         const companyDB = companies.shift()
         countCompanies++
         if (!!companyDB) {
-            console.log(`\n\nlog => company => ${padL((companyDB.name), ' ', 20)}: ${padL(countCompanies + '/' + lenCompanies, ' ', 10)} - ${Math.trunc((countCompanies * 100) / lenCompanies)}%`)
+            console.log(`\nlog => company => ${padL((companyDB.name), ' ', 20)}: ${padL(countCompanies + '/' + lenCompanies, ' ', 10)} - ${Math.trunc((countCompanies * 100) / lenCompanies)}%`)
             const codes: string[] = replaceAll(companyDB.code, ' ', '').split(',')
             //
             while (codes.length > 0) {
@@ -205,22 +205,27 @@ export const updateQuotesServiceWhile = async (): Promise<void> => {
                     const lenQuotes = Object.keys(quotes).length
                     //
                     if (!!quotes && lenQuotes > 0) {
-                        //
-                        const lastUpdate = await getLastUpdateByCodeStock(code)
-                        //
                         const keys = Object.keys(quotes)
                         while (keys.length > 0) {
                             const keyDate = keys.shift()
+                            //
                             if (!!keyDate) {
                                 const dateAPI = new Date(keyDate)
-                                //console.log(`code: ${code} --- dateAPI: ${dateAPI} --- lastUpdate: ${lastUpdate}`)
-                                const needsUpdate = !lastUpdate || (dateAPI > lastUpdate)
+                                // console.log(`keyDate: ${keyDate}`)
+                                const quotesByDate = await getQuoteByCodeStockAndDate({
+                                    codeStock: code,
+                                    date: dateToPregaoHiphen(dateAPI, true)
+                                })
+                                // console.log(`quotesByDate: ${quotesByDate}`)
+                                const needsUpdate = !(!!quotesByDate && !!quotesByDate.length && quotesByDate.length > 0)
                                 //
                                 if (needsUpdate) {
                                     // @ts-ignore
                                     const quoteAPI = quotes[keyDate] as HistoricalResponse
                                     const quoteToInsert = new Quote(companyDB.id_api, code, parseFloat(quoteAPI['1. open']), parseFloat(quoteAPI['4. close']), parseFloat(quoteAPI['2. high']), parseFloat(quoteAPI['3. low']), parseFloat(quoteAPI['6. volume']), dateAPI, parseFloat(quoteAPI['7. dividend amount']), parseFloat(quoteAPI['8. split coefficient']))
                                     quotesToAdd.push(quoteToInsert)
+                                    // console.log('quoteToInsert')
+                                    // console.log(quoteToInsert)
                                 }
                             }
                         }
