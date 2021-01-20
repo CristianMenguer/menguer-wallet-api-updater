@@ -1,19 +1,19 @@
 import express, { Response, Request } from 'express'
 import cron from 'node-cron'
-import { updateQuotesService } from './services/UpdateDatabaseAPIService'
+import { updateQuotesService, updateQuotesServiceWhile } from './services/UpdateDatabaseAPIService'
 
 const HOSTNAME = '0.0.0.0'
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000
 
-cron.schedule('*/15 * * * *', () => console.log(`${new Date()}: Keep app running!`), {
-    scheduled: true,
-    timezone: "America/Sao_Paulo"
-})
+// cron.schedule('*/15 * * * *', () => console.log(`${new Date()}: Keep app running!`), {
+//     scheduled: true,
+//     timezone: "America/Sao_Paulo"
+// })
 
 cron.schedule('0 18-20-22 * * 1-5', () => {
     console.log('cron')
-    updateQuotesService()
+    updateQuotesServiceWhile()
 }, {
     scheduled: true,
     timezone: "America/Sao_Paulo"
@@ -23,7 +23,7 @@ const app = express()
 
 app.get('/checkforupdates', (request: Request, response: Response) => {
     console.log('checkforupdates')
-    updateQuotesService()
+    updateQuotesServiceWhile()
 
     return response.status(404).json({
         title: 'Welcome to Menguer Wallet - 2020087 API 👍🏼',
