@@ -213,7 +213,7 @@ export const updateQuotesServiceWhile = async (): Promise<void> => {
                             const keyDate = keys.shift()
                             if (!!keyDate) {
                                 const dateAPI = new Date(keyDate)
-                                console.log(`code: ${code} --- dateAPI: ${dateAPI} --- lastUpdate: ${lastUpdate}`)
+                                //console.log(`code: ${code} --- dateAPI: ${dateAPI} --- lastUpdate: ${lastUpdate}`)
                                 const needsUpdate = !lastUpdate || (dateAPI > lastUpdate)
                                 //
                                 if (needsUpdate) {
