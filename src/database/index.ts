@@ -11,7 +11,7 @@ const MONGO_OPTIONS = {
 
 export const info = () => {
     console.log('uri: ' + uri)
-    console.log('db_name: ' + DB_NAME)    
+    console.log('db_name: ' + DB_NAME)
 }
 
 export const aggregate = (collectionName: string, pipeline = [], query = {}) => {
@@ -28,7 +28,7 @@ export const aggregate = (collectionName: string, pipeline = [], query = {}) => 
             const collection = db.collection(collectionName)
 
             const newPipe = createPipeline(pipeline, query)
-            
+
             collection.aggregate(newPipe).toArray((err, docs) => {
                 if (err) {
                     console.log(' --- aggregate ERROR --- ')
@@ -171,6 +171,33 @@ export const addMany = (collectionName: string, items: object[]) => {
                     reject(err)
                 }
                 resolve(result)
+                client.close()
+            })
+        })
+    })
+}
+
+export const getDistinct = (collectionName: string, field: string): Promise<Object[]> => {
+
+    return new Promise((resolve, reject) => {
+        MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+            if (err) {
+                console.log(' --- get ERROR --- ')
+                console.error('An error occurred connecting to MongoDB: ', err)
+                reject(err)
+            }
+            //
+            const db = client.db(DB_NAME)
+            const collection = db.collection(collectionName)
+
+            collection.distinct(field, (err, docs) => {
+                if (err) {
+                    console.log(' --- add ERROR --- ')
+                    console.log(err)
+                    reject(err)
+                } else {
+                    resolve(docs)
+                }
                 client.close()
             })
         })

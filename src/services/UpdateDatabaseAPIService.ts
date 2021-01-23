@@ -198,7 +198,8 @@ export const updateQuotesServiceWhile = async (): Promise<void> => {
             while (codes.length > 0) {
                 const code = codes.shift()
                 //
-                if (!!code && code.length >= 4) {
+                if (!!code && code.length >= 4)// && code === 'PETR4') 
+                {
                     while (((new Date()).getTime() - previousDate.getTime()) < DELAY_CONN)
                         await sleep(Math.floor(DELAY_CONN / 5))
                     //
@@ -219,11 +220,18 @@ export const updateQuotesServiceWhile = async (): Promise<void> => {
                             if (!!keyDate) {
                                 const dateAPI = new Date(keyDate)
                                 //
+                                // console.log('\n\n')
+                                // console.log('dateAPI')
+                                // console.log(dateAPI)
                                 const quoteByDate = quotesSQLite.filter(quoteFilter => datesEqual(quoteFilter.date, dateAPI))
                                 const needsUpdate = !quoteByDate || !quoteByDate.length || quoteByDate.length < 1
+                                // console.log('needsUpdate')
+                                // console.log(needsUpdate)
+                                // console.log('\n\n')
                                 //
                                 if (needsUpdate) {
                                     // @ts-ignore
+
                                     const quoteAPI = quotes[keyDate] as HistoricalResponse
                                     const quoteToInsert = new Quote(companyDB.id_api, code, parseFloat(quoteAPI['1. open']), parseFloat(quoteAPI['4. close']), parseFloat(quoteAPI['2. high']), parseFloat(quoteAPI['3. low']), parseFloat(quoteAPI['6. volume']), dateAPI, parseFloat(quoteAPI['7. dividend amount']), parseFloat(quoteAPI['8. split coefficient']))
                                     quotesToAdd.push(quoteToInsert)

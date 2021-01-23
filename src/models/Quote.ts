@@ -89,6 +89,19 @@ interface ParamDates {
     dateTo?: string
 }
 
+export const getDistinctCodeStock = async (): Promise<string[]> => {
+    try {
+
+        // @ts-ignore
+        const response = await db.getDistinct(COLLECTION, 'code_stock')  as string[]
+        return (!!response.length && response.length > 0) ? response : []
+    } catch (err) {
+        console.log('Error: > Quote.model > getDistinctCodeStock:')
+        console.log(err)
+        return []
+    }
+}
+
 export const getQuoteByCodeStockAndDate = async (params: ParamDates): Promise<Quote[]> => {
 
     const { codeStock, date, dateFrom, dateTo } = params
@@ -143,5 +156,19 @@ export const getAmountQuotesByCodeStock = async (codeStock: string): Promise<num
         console.log('Error: > Quote.model > getAmountQuotesByCodeStock:')
         console.log(err)
         return 0
+    }
+}
+
+export const getQuotes = async (query = {}): Promise<Quote[]> => {
+    
+    try {
+        const quotes = await db.get(COLLECTION, query) as Quote[]
+        
+        return quotes
+    }
+    catch (err) {
+        console.log('Error: > Quote.model > getQuotes:')
+        console.log(err)
+        return []
     }
 }

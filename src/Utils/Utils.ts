@@ -22,3 +22,14 @@ export const padL = (input: string, strFill: string, length: number): string => 
 export const padR = (input: string, strFill: string, length: number): string => {
     return (length <= input.length) ? input : padL((input + strFill), strFill, length)
 }
+
+export const datesEqual = (date1: Date, date2: Date): boolean => {
+    if (date1 === null || date2 === null)
+        return false
+    //
+    let result = true
+    result = result && (date1.getFullYear() === date2.getFullYear())
+    result = result && (date1.getMonth() === date2.getMonth())
+    result = result && (date1.getDate() === date2.getDate())
+    return result
+}
