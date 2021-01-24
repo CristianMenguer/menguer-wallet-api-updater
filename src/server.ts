@@ -23,24 +23,16 @@ function pinger_ping(url: string = 'google.com') {
 }
 
 cron.schedule('*/15 * * * *', () => {
-    // console.log(`${new Date()}: Keep app running!`)
-    // pinger_ping(`http://${HOSTNAME}:${PORT}/`)
+    console.log(`${new Date()}: Keep app running!`)
+    pinger_ping(`http://${HOSTNAME}:${PORT}/`)
 }, {
     scheduled: true,
     timezone: "America/Sao_Paulo"
 })
 
-cron.schedule('0 18-20-22 * * 1-5', () => {
-    // console.log('> cron')
-    //updateQuotesServiceWhile()
-}, {
-    scheduled: true,
-    timezone: "America/Sao_Paulo"
-})
-
-cron.schedule('30 18-20-22 * * 1-5', () => {
-    // console.log('> cron strategies')
-    // updateStrategies()
+cron.schedule('0 18-20-22 * * 1-5', async () => {
+    await updateQuotesServiceWhile()
+    await updateStrategies()
 }, {
     scheduled: true,
     timezone: "America/Sao_Paulo"
