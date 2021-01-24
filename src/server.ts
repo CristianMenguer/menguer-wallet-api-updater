@@ -60,5 +60,4 @@ app.use((request: Request, response: Response) => {
 
 app.listen(PORT, HOSTNAME, () => {
     console.log(`> Server started on ${HOSTNAME}:${PORT} 👌`)
-    updateStrategies()
 })
