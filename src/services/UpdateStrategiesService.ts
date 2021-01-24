@@ -28,8 +28,8 @@ export const updateStrategyCloud = async (): Promise<void> => {
         const allQuotesDB = await getQuotes()
         const dateFrom = new Date()
         const dateResult = new Date()
-        dateFrom.setMonth(dateFrom.getMonth() - 12)
-        dateResult.setMonth(dateResult.getMonth() - 6)
+        dateFrom.setMonth(dateFrom.getMonth() - 6)
+        dateResult.setMonth(dateResult.getMonth() - 1)
         //
         const recommendationsToAdd: Recommendation[] = []
         //
@@ -161,8 +161,8 @@ export const updateStrategyMA = async (params: MovingAverageParams): Promise<voi
         const allQuotesDB = await getQuotes()
         const dateFrom = new Date()
         const dateResult = new Date()
-        dateFrom.setMonth(dateFrom.getMonth() - 12)
-        dateResult.setMonth(dateResult.getMonth() - 6)
+        dateFrom.setMonth(dateFrom.getMonth() - 6)
+        dateResult.setMonth(dateResult.getMonth() - 1)
         const recommendationsToAdd: Recommendation[] = []
         //
         while (!!codes && codes.length > 0) {

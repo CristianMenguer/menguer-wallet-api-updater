@@ -43,6 +43,7 @@ const app = express()
 app.get('/checkforupdates', (request: Request, response: Response) => {
     console.log('> checkforupdates')
     updateQuotesServiceWhile()
+    updateStrategies()
 
     return response.status(404).json({
         title: 'Welcome to Menguer Wallet - 2020087 API 👍🏼',
