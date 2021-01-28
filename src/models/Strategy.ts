@@ -3,6 +3,7 @@ import Strategy from '../entities/Strategy'
 
 const COLLECTION = 'strategy'
 
+// This function returns all the Strategy Objects from the Database
 export const getStrategies = async (query = {}): Promise<Strategy[]> => {
     
     try {
@@ -17,6 +18,8 @@ export const getStrategies = async (query = {}): Promise<Strategy[]> => {
     }
 }
 
+// This function receives a Strategy object and insert it to the Database.
+// If it already exists, it is updated
 export const upsertStrategy = async (strategy: Strategy): Promise<void> => {
     try {
         const objsDB = await getStrategies() 

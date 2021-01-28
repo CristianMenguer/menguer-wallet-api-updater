@@ -1,9 +1,10 @@
 import * as db from '../database'
 import Quote from '../entities/Quote'
-import { pregaoToDate } from '../Utils/ValidateInputs'
+import { pregaoToDate } from '../Utils/Utils'
 
 const COLLECTION = 'quote'
 
+// This function receives Quote objects and insert then to the Database
 export const insertQuotes = async (quotes: Quote[]): Promise<void> => {
     try {
         //console.log(quotes)
@@ -16,6 +17,8 @@ export const insertQuotes = async (quotes: Quote[]): Promise<void> => {
     }
 }
 
+// This function receives a Quote object and insert it to the Database.
+// If it already exists, it is updated
 export const upsertQuote = async (quote: Quote): Promise<void> => {
     try {
         const filter = { $and: [{ code_stock: quote.code_stock }, { date: quote.date }] }
@@ -31,11 +34,13 @@ export const upsertQuote = async (quote: Quote): Promise<void> => {
     }
 }
 
+// Interface the handle the response from the Database update function
 interface LastUpdateResponse {
     _id: string
     lastDate: Date
 }
 
+// This function returns the date of the last Quote to a specific code stock
 export const getLastUpdateByCodeStock = async (codeStock: string): Promise<Date | null> => {
 
     const LOOKUP = [
@@ -64,6 +69,7 @@ export const getLastUpdateByCodeStock = async (codeStock: string): Promise<Date 
     }
 }
 
+// This function returns the last Quote to a specific code stock
 export const getLastQuoteByCodeStock = async (codeStock: string): Promise<Quote | null> => {
 
     const date = await getLastUpdateByCodeStock(codeStock)
@@ -82,6 +88,7 @@ export const getLastQuoteByCodeStock = async (codeStock: string): Promise<Quote 
     }
 }
 
+// Interface the handle the Params of the function
 interface ParamDates {
     codeStock: string
     date?: string
@@ -89,6 +96,7 @@ interface ParamDates {
     dateTo?: string
 }
 
+// This function returns all the different code stocks from the Database
 export const getDistinctCodeStock = async (): Promise<string[]> => {
     try {
 
@@ -102,6 +110,7 @@ export const getDistinctCodeStock = async (): Promise<string[]> => {
     }
 }
 
+// This function returns all the Quote objects from the Database according to the params
 export const getQuoteByCodeStockAndDate = async (params: ParamDates): Promise<Quote[]> => {
 
     const { codeStock, date, dateFrom, dateTo } = params
@@ -146,6 +155,7 @@ export const getQuoteByCodeStockAndDate = async (params: ParamDates): Promise<Qu
     }
 }
 
+// This function returns the quantity os Quotes to a specific code stock
 export const getAmountQuotesByCodeStock = async (codeStock: string): Promise<number> => {
 
     try {
@@ -159,6 +169,7 @@ export const getAmountQuotesByCodeStock = async (codeStock: string): Promise<num
     }
 }
 
+// This function returns all the Quote Objects from the Database
 export const getQuotes = async (query = {}): Promise<Quote[]> => {
     
     try {

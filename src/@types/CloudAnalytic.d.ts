@@ -1,3 +1,5 @@
+//Interface used in the whole app to help the calculation of the Ichimoku Cloud
+
 interface CloudAnalytic {
     value: number
     ConversionLine: number

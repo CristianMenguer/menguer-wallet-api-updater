@@ -1,9 +1,9 @@
 import * as db from '../database'
 import Recommendation from '../entities/Recommendation'
-import { pregaoToDate } from '../Utils/ValidateInputs'
 
 const COLLECTION = 'recommendation'
 
+// This function receives Quote objects and insert then to the Database
 export const insertRecommendations = async (recommendations: Recommendation[]): Promise<void> => {
     try {
         const results = await db.addMany(COLLECTION, recommendations)
@@ -14,6 +14,7 @@ export const insertRecommendations = async (recommendations: Recommendation[]): 
     }
 }
 
+// This function returns all the Recommendation Objects from the Database
 export const getRecommendations = async (query = {}): Promise<Recommendation[]> => {
     
     try {

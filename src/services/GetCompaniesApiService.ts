@@ -2,6 +2,7 @@ import axios from 'axios'
 
 // https://api-cotacao-b3.labdo.it/
 
+// This function requests from the third-party API the list of Companies e return it
 const apiCompanies = async (): Promise<CompanyResponse[]> => {
     const link = 'https://api-cotacao-b3.labdo.it/api/empresa'
 

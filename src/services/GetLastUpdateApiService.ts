@@ -2,6 +2,7 @@ import axios from 'axios'
 
 // https://api-cotacao-b3.labdo.it/
 
+// This function requests from the third-party API the status of the API
 const sysInfoApiDaily = async (): Promise<SysInfoResponse | null> => {
     const link = 'https://api-cotacao-b3.labdo.it/api/sysinfo'
     

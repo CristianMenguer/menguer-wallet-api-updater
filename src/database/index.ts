@@ -1,19 +1,30 @@
 import { MongoClient } from 'mongodb'
 import { config } from 'dotenv'
 
+/**
+ * This is the file that connects to the MongoDB Database, all the connections 
+ * are in this file.
+ */
+
+
+// This method is necessary to read the environment variables
 config()
 
+// Here the enviroment variables are read
 const uri = process.env.MONGO_URI as string
 const DB_NAME = process.env.MONGO_DB_NAME as string
 const MONGO_OPTIONS = {
     useUnifiedTopology: true, useNewUrlParser: true
 }
 
+// Method used only for tests, to check if the variables were read correctly
 export const info = () => {
     console.log('uri: ' + uri)
     console.log('db_name: ' + DB_NAME)
 }
 
+// Function that use the method Aggregate from MongoDB, 
+// receiving a Pipeline and sending it as a parameter
 export const aggregate = (collectionName: string, pipeline = [], query = {}) => {
 
     return new Promise((resolve, reject) => {
@@ -30,6 +41,7 @@ export const aggregate = (collectionName: string, pipeline = [], query = {}) => 
             const newPipe = createPipeline(pipeline, query)
 
             collection.aggregate(newPipe).toArray((err, docs) => {
+                // Error checking
                 if (err) {
                     console.log(' --- aggregate ERROR --- ')
                     console.log(err)
@@ -42,6 +54,7 @@ export const aggregate = (collectionName: string, pipeline = [], query = {}) => 
     })
 }
 
+// Function that creates a Pipeline properly to be sent
 const createPipeline = (pipeline: {}[], query = {}): {}[] => {
     const queryArr = Object.entries(query)
 
@@ -58,10 +71,13 @@ const createPipeline = (pipeline: {}[], query = {}): {}[] => {
     return pipeline
 }
 
+// Function that use the method find from MongoDB, 
+// sending a query as parameter if sent to the function
 export const get = (collectionName: string, query = {}): Promise<Object[]> => {
 
     return new Promise((resolve, reject) => {
         MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+            // Error checking
             if (err) {
                 console.log(' --- get ERROR --- ')
                 console.error('An error occurred connecting to MongoDB: ', err)
@@ -72,6 +88,7 @@ export const get = (collectionName: string, query = {}): Promise<Object[]> => {
             const collection = db.collection(collectionName)
 
             collection.find(query).toArray((err, docs) => {
+                // Error checking
                 if (err) {
                     console.error('An error occurred getting data from MongoDB: ', err)
                     reject(err)
@@ -84,9 +101,12 @@ export const get = (collectionName: string, query = {}): Promise<Object[]> => {
     })
 }
 
+// Function that use the method insertOne from MongoDB, 
+// adding a new object to the Database
 export const add = (collectionName: string, item: object) => {
     return new Promise((resolve, reject) => {
         MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+            // Error checking
             if (err) {
                 console.log(' --- add ERROR --- ')
                 console.log(err)
@@ -95,6 +115,7 @@ export const add = (collectionName: string, item: object) => {
             const db = client.db(DB_NAME)
             const collection = db.collection(collectionName)
             collection.insertOne(item, (err, result) => {
+                // Error checking
                 if (err) {
                     console.log(' --- add ERROR --- ')
                     console.log(err)
@@ -107,6 +128,8 @@ export const add = (collectionName: string, item: object) => {
     })
 }
 
+// Function that use the method findOneAndUpdate from MongoDB, 
+// updating an object in the Database
 export const update = (collectionName: string, filter = {}, update = {}, options = {}) => {
     return new Promise((resolve, reject) => {
         MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
@@ -118,6 +141,7 @@ export const update = (collectionName: string, filter = {}, update = {}, options
             const db = client.db(DB_NAME)
             const collection = db.collection(collectionName)
             collection.findOneAndUpdate(filter, update, { returnOriginal: false, ...options }, (err, result) => {
+                // Error checking
                 if (err) {
                     console.log(' --- update ERROR --- ')
                     console.log(err)
@@ -131,9 +155,12 @@ export const update = (collectionName: string, filter = {}, update = {}, options
     })
 }
 
+// Function that use the method countDocuments from MongoDB, 
+// returning the total of documents in a specific collection
 export const count = ((collectionName: string, filter = {}) => {
     return new Promise((resolve, reject) => {
         MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+            // Error checking
             if (err) {
                 console.log(' --- count ERROR --- ')
                 console.log(err)
@@ -142,6 +169,7 @@ export const count = ((collectionName: string, filter = {}) => {
             const db = client.db(DB_NAME)
             const collection = db.collection(collectionName)
             collection.countDocuments(filter, (err, docs) => {
+                // Error checking
                 if (err) {
                     console.log(' --- count ERROR --- ')
                     console.log(err)
@@ -154,9 +182,12 @@ export const count = ((collectionName: string, filter = {}) => {
     })
 })
 
+// Function that use the method insertMany from MongoDB, 
+// adding new objects to the Database
 export const addMany = (collectionName: string, items: object[]) => {
     return new Promise((resolve, reject) => {
         MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+            // Error checking
             if (err) {
                 console.log(' --- add ERROR --- ')
                 console.log(err)
@@ -165,6 +196,7 @@ export const addMany = (collectionName: string, items: object[]) => {
             const db = client.db(DB_NAME)
             const collection = db.collection(collectionName)
             collection.insertMany(items, (err, result) => {
+                // Error checking
                 if (err) {
                     console.log(' --- add ERROR --- ')
                     console.log(err)
@@ -177,10 +209,14 @@ export const addMany = (collectionName: string, items: object[]) => {
     })
 }
 
+
+// Function that use the method distinct from MongoDB, 
+// returning the unique objects of a specific collection
 export const getDistinct = (collectionName: string, field: string): Promise<Object[]> => {
 
     return new Promise((resolve, reject) => {
         MongoClient.connect(uri, MONGO_OPTIONS, (err, client) => {
+            // Error checking
             if (err) {
                 console.log(' --- get ERROR --- ')
                 console.error('An error occurred connecting to MongoDB: ', err)
@@ -191,6 +227,7 @@ export const getDistinct = (collectionName: string, field: string): Promise<Obje
             const collection = db.collection(collectionName)
 
             collection.distinct(field, (err, docs) => {
+                // Error checking
                 if (err) {
                     console.log(' --- add ERROR --- ')
                     console.log(err)

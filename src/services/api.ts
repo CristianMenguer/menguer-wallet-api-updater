@@ -5,3 +5,5 @@ const api = axios.create({
 })
 
 export default api
+
+// This file is responsible for creating the object api to be used everywhere in the application

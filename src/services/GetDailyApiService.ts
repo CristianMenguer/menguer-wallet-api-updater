@@ -2,6 +2,9 @@ import axios from 'axios'
 
 // https://api-cotacao-b3.labdo.it/
 
+// This function requests from the third-party API the Quotes to a
+// specific Company e returns it. 
+// This is the one not being used
 export const apiDaily = async (companyCode: string): Promise<DailyResponse[]> => {
     const api = 'https://api-cotacao-b3.labdo.it/api/cotacao/cd_acao'
     const link = `${api}/${companyCode}`

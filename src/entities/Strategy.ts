@@ -1,3 +1,5 @@
+// Class Strategy and its constructor defined here
+
 class Strategy {
     _id?: string
     id: number
