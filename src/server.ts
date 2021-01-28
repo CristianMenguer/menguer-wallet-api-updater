@@ -1,7 +1,6 @@
 import express, { Response, Request } from 'express'
 import cron from 'node-cron'
 import { updateQuotesServiceWhile } from './services/UpdateDatabaseAPIService'
-import api from './services/api'
 import { updateStrategies } from './services/UpdateStrategiesService'
 
 // Reading form environment variables
